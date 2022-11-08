@@ -87,6 +87,7 @@ def graph(data, result):
     explainer = shap.TreeExplainer(model, data=X)
     shap_values = explainer(df_copy.loc[50][:-1])
     fig = shap.plots.bar(shap_values[:, 0])
+    st.set_option('deprecation.showPyplotGlobalUse', False)
     st.pyplot(fig)
 
 def main():
