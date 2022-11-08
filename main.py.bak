@@ -13,30 +13,30 @@ df = pd.read_csv('data_request.csv')
 pickle_in = open("model.pkl", "rb")
 model = pickle.load(pickle_in)
 
-def test_test():
+def predict(data):
     json_test={
-      "CODE_GENDER_F": 0,
-      "CODE_GENDER_M": 0,
-      "CODE_REJECT_REASON_CLIENT_mean": 0,
-      "CODE_REJECT_REASON_HC_mean": 0,
-      "CODE_REJECT_REASON_LIMIT_mean": 0,
-      "CODE_REJECT_REASON_SCOFR_mean": 0,
-      "CODE_REJECT_REASON_SCO_mean": 0,
-      "CODE_REJECT_REASON_SYSTEM_mean": 0,
-      "CODE_REJECT_REASON_VERIF_mean": 0,
-      "CODE_REJECT_REASON_XAP_mean": 0,
-      "CODE_REJECT_REASON_XNA_mean": 0,
-      "EXT_SOURCE_2": 0,
-      "EXT_SOURCE_3": 0,
-      "FLAG_OWN_CAR_N": 0,
-      "FLAG_OWN_CAR_Y": 0,
-      "NAME_EDUCATION_TYPE_Academic_degree": 0,
-      "NAME_EDUCATION_TYPE_Higher_education": 0,
-      "NAME_EDUCATION_TYPE_Incomplete_higher": 0,
-      "NAME_EDUCATION_TYPE_Lower_secondary": 0,
-      "NAME_EDUCATION_TYPE_Secondary_secondary_special": 0
+      "CODE_GENDER_F": data[0][0],
+      "CODE_GENDER_M": data[0][1],
+      "CODE_REJECT_REASON_CLIENT_mean": data[0][2],
+      "CODE_REJECT_REASON_HC_mean": data[0][3],
+      "CODE_REJECT_REASON_LIMIT_mean": data[0][4],
+      "CODE_REJECT_REASON_SCOFR_mean": data[0][5],
+      "CODE_REJECT_REASON_SCO_mean": data[0][6],
+      "CODE_REJECT_REASON_SYSTEM_mean": data[0][7],
+      "CODE_REJECT_REASON_VERIF_mean": data[0][8],
+      "CODE_REJECT_REASON_XAP_mean": data[0][9],
+      "CODE_REJECT_REASON_XNA_mean": data[0][10],
+      "EXT_SOURCE_2": data[0][11],
+      "EXT_SOURCE_3": data[0][12],
+      "FLAG_OWN_CAR_N": data[0][13],
+      "FLAG_OWN_CAR_Y": data[0][14],
+      "NAME_EDUCATION_TYPE_Academic_degree": data[0][15],
+      "NAME_EDUCATION_TYPE_Higher_education": data[0][16],
+      "NAME_EDUCATION_TYPE_Incomplete_higher": data[0][17],
+      "NAME_EDUCATION_TYPE_Lower_secondary": data[0][18],
+      "NAME_EDUCATION_TYPE_Secondary_secondary_special": data[0][19]
     }
-
+    #request API on HEROKU
     response = requests.post('https://backendprojectseven.herokuapp.com/predict', json=json_test)
     return response.content
     
@@ -82,17 +82,18 @@ def graph(data, result):
     fig = plt.figure(figsize=(10, 4))
     features = df.columns[:-1]
     X = df[features]
-    st.subheader('Result Interpretability - Applicant Level')
+    st.subheader('interprétabilité local')
     shap.initjs()
-    explainer = shap.TreeExplainer(model, data=X.values)
-    shap_values = explainer(df_copy.loc[50][:-1].values)
+    explainer = shap.TreeExplainer(model, data=X)
+    shap_values = explainer(df_copy.loc[50][:-1])
     fig = shap.plots.bar(shap_values[:, 0])
+    st.set_option('deprecation.showPyplotGlobalUse', False)
     st.pyplot(fig)
 
 def main():
 
     st.title('Scoring Credit')
-        
+    
     CODE_GENDER = st.radio('Select gender:', ['Female', 'Male'], horizontal = True)
     
     st.write('code reject reason :')
@@ -163,9 +164,10 @@ def main():
         data = [CODE_GENDER + [CODE_REJECT_REASON_CLIENT_mean, CODE_REJECT_REASON_HC_mean, CODE_REJECT_REASON_LIMIT_mean, CODE_REJECT_REASON_SCOFR_mean, CODE_REJECT_REASON_SCO_mean, CODE_REJECT_REASON_SYSTEM_mean,
                 CODE_REJECT_REASON_VERIF_mean, CODE_REJECT_REASON_XAP_mean, CODE_REJECT_REASON_XNA_mean, EXT_SOURCE_2, EXT_SOURCE_3] + FLAG_OWN_CAR + NAME_EDUCATION_TYPE]
         
-        pred = test_test()
+        pred = predict(data)
+        st.write(pred == b'[0]')
         
-        if pred[0] == 0:
+        if pred == b'[0]':
             st.success('credit accorder')
             graph(data, 0)
         else:
