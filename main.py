@@ -41,7 +41,7 @@ def test_test():
     return response.content
     
 def graph(data, result):
-
+    
     features = df.columns[:-1]
     X = df[features]
     pca = PCA(n_components=0.97)
@@ -61,7 +61,8 @@ def graph(data, result):
                 sb.barplot(x=df_copy.loc[df[col] == 1].TARGET.value_counts().index, 
                            y=df_copy.loc[df[col] == 1].TARGET.value_counts())
                 plt.title(col)
-                st.pyplot(fig)       
+                st.pyplot(fig)  
+                
     cols = [col for col in df_copy if 'CODE_REJECT' in col or 'EXT_SOURCE' in col]
     fig, axs = plt.subplots(2, 9, figsize=(40, 20))
     for index_e, col_EXT in enumerate(cols[-2:]):
@@ -78,12 +79,14 @@ def graph(data, result):
             axs[index_e, index_c].set_xlim(-0.1, 1.1)
     st.pyplot(fig)
     
+    fig = plt.figure(figsize=(10, 4))
     features = df.columns[:-1]
     X = df[features]
+    st.subheader('Result Interpretability - Applicant Level')
     shap.initjs()
     explainer = shap.TreeExplainer(model, data=X)
-    shap_values = explainer(data)
-    fig = shap.plots.bar(shap_values)
+    shap_values = explainer(df_copy.loc[50][:-1])
+    fig = shap.plots.bar(shap_values[:, 0])
     st.pyplot(fig)
 
 def main():
