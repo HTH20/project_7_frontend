@@ -7,3 +7,4 @@ requests
 sklearn
 scipy
 shap
+ipython
