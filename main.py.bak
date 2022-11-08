@@ -37,7 +37,7 @@ def test_test():
       "NAME_EDUCATION_TYPE_Secondary_secondary_special": 0
     }
 
-    response = requests.post('https://backendprojectseven.herokuapp.com/predict', json=json_test)
+    response = requests.post('http://127.0.0.1:8000/predict', json=json_test)
     return response.content
     
 def graph(data, result):

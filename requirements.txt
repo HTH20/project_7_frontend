@@ -1,7 +1,6 @@
 pandas
 streamlit
 numpy
-pickle
 seaborn
 matplotlib
 requests
